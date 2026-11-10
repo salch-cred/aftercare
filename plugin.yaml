@@ -1,0 +1,43 @@
+name: aftercare
+version: 0.1.0
+manifest_version: 2
+api_version: 1
+description: >-
+  Your agent checks its own work after the fact. When a reply says something is deployed or live at
+  a public address, Aftercare remembers it, and every few hours, at the start of a session, checks it
+  again with one plain GET request. If something the agent said was working stops answering, the
+  agent is told at the start of your next turn and tells you first; you hear when it is back, too.
+  /aftercare lists, checks, adds and forgets watched addresses; `hermes aftercare check` runs from cron.
+  Never checks localhost or private networks, and never runs commands.
+author: salch-cred
+license: MIT
+homepage: https://github.com/salch-cred/aftercare
+tags: [monitoring, uptime, deployment, reliability, devops, verification]
+requires_hermes: ">=0.23"
+
+provides_hooks:
+  - post_llm_call
+  - on_session_start
+  - pre_llm_call
+
+config_schema:
+  auto_watch:
+    type: bool
+    default: true
+    description: Watch public addresses a reply says are deployed or live.
+  every_hours:
+    type: float
+    default: 6
+    description: Hours between checks of each address.
+  keep_days:
+    type: int
+    default: 30
+    description: Stop watching an address this many days after it was last claimed.
+  max_watches:
+    type: int
+    default: 25
+    description: Most addresses watched at once; the oldest is dropped first.
+  timeout:
+    type: float
+    default: 8
+    description: Seconds to wait for each address to answer.
